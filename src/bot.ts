@@ -58,13 +58,12 @@ const DISTRICTS = [
   "Davlatobod",
   "Kosonsoy",
   "Mingbuloq",
-  "Namangan",
   "Norin",
   "Pop",
   "Toʻraqoʻrgʻon",
   "Uchqoʻrgʻon",
   "Uychi",
-  "Yangi Namangan",
+  "Namangan Shaxri",
   "Yangiqoʻrgʻon",
 ];
 
