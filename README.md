@@ -1,20 +1,29 @@
 # NIS-Vacancy Telegram Bot
 
-A Telegram bot that collects job applications through a step-by-step questionnaire
-and sends each completed application to an admin chat or HR group.
+A Telegram bot (in Uzbek) that collects job applications for Namangan
+International School (NIS) through a step-by-step questionnaire and sends each
+completed application to an admin chat and a Google Sheet.
 
 ## Questions it asks
 
 1. Full name
-2. Phone number (typed, or shared via the contact button)
-3. City / NIS school
-4. Position applying for
-5. Work experience
-6. Education
-7. CV file upload (PDF/Word, optional — `/skip` to finish without one)
+2. Gender (Ayol / Erkak buttons)
+3. Age (validated number)
+4. District (Namangan region district buttons)
+5. Phone number (typed, or shared via the contact button)
+6. Education (degree, university, year)
+7. Specialty
+8. Certificates (CEFR, SAT, IELTS, ...)
+9. Work experience
+10. NIS branch (Chortoq / Uychi buttons)
+11. Intended work duration
+12. CV file upload (PDF/Word, optional — "⏭ O'tkazib yuborish" button to skip)
 
-When the applicant finishes, the bot sends a formatted summary (plus the CV file,
-if uploaded) to the chat configured in `ADMIN_CHAT_ID`.
+The applicant then confirms the truthfulness of their answers
+("✅ Tasdiqlayman") before the application is submitted. The bot sends a
+formatted summary (plus the CV file, if uploaded) to the chat configured in
+`ADMIN_CHAT_ID`, appends a row to the Google Sheet, and shows the applicant a
+copy of what was submitted.
 
 ## Setup
 
