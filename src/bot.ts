@@ -51,6 +51,31 @@ const phoneKeyboard = new Keyboard()
   .resized()
   .oneTime();
 
+const DISTRICTS = [
+  "Chortoq",
+  "Chust",
+  "Davlatobod",
+  "Kosonsoy",
+  "Mingbuloq",
+  "Namangan",
+  "Norin",
+  "Pop",
+  "Toʻraqoʻrgʻon",
+  "Uchqoʻrgʻon",
+  "Uychi",
+  "Yangi Namangan",
+  "Yangiqoʻrgʻon",
+];
+
+const districtKeyboard = (() => {
+  const kb = new Keyboard();
+  DISTRICTS.forEach((district, i) => {
+    kb.text(district);
+    if (i % 3 === 2) kb.row();
+  });
+  return kb.resized().oneTime();
+})();
+
 const BRANCH_OPTIONS = ["Chortoq tumani filiali", "Uychi tumani filiali"];
 const branchKeyboard = new Keyboard()
   .text(BRANCH_OPTIONS[0])
@@ -82,8 +107,12 @@ const STEPS: Step[] = [
   },
   {
     key: "address",
-    prompt:
-      "Yashash manzilingizni yozing (iltimos, tuman yoki shahar nomini kiriting):",
+    prompt: "Yashash manzilingizni tanlang:",
+    keyboard: districtKeyboard,
+    validate: (text) =>
+      DISTRICTS.includes(text)
+        ? undefined
+        : "Iltimos, quyidagi tugmalardan tumaningizni tanlang.",
   },
   {
     key: "phone",
