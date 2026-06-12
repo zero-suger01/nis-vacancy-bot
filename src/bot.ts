@@ -34,7 +34,8 @@ type AnswerKey =
   | "specialty"
   | "certificates"
   | "experience"
-  | "branch";
+  | "branch"
+  | "duration";
 
 interface Step {
   key: AnswerKey;
@@ -145,6 +146,11 @@ const STEPS: Step[] = [
         ? undefined
         : "Iltimos, quyidagi tugmalardan birini tanlang: Chortoq tumani filiali yoki Uychi tumani filiali.",
   },
+  {
+    key: "duration",
+    prompt:
+      "Namangan International School (NIS) maktabida qancha muddat ishlamoqchisiz?",
+  },
 ];
 
 const SKIP_TEXT = "⏭ O'tkazib yuborish";
@@ -232,6 +238,7 @@ function answerLines(ctx: BotContext): string[] {
     `📜 Sertifikatlar: ${a.certificates ?? "-"}`,
     `🛠 Tajriba: ${a.experience ?? "-"}`,
     `🏫 Filial: ${a.branch ?? "-"}`,
+    `⏳ Ishlash muddati: ${a.duration ?? "-"}`,
     `📎 CV: ${ctx.session.cvFileName ?? (ctx.session.cvFileId ? "biriktirilgan" : "yuklanmagan")}`,
   ];
 }
@@ -288,6 +295,7 @@ async function appendToSheet(ctx: BotContext): Promise<void> {
     certificates: a.certificates ?? "-",
     experience: a.experience ?? "-",
     branch: a.branch ?? "-",
+    duration: a.duration ?? "-",
     cv: ctx.session.cvFileName ?? (ctx.session.cvFileId ? "biriktirilgan" : "yuklanmagan"),
     telegram: `${user?.username ? `@${user.username}` : "-"} (id ${user?.id ?? "?"})`,
   };
@@ -347,7 +355,7 @@ bot.command("start", async (ctx) => {
   resetSession(ctx);
   ctx.session.step = 0;
   await ctx.reply(
-    "👋 NIS-Vacancy botiga xush kelibsiz!\n\n✨ Sizda oilamiz a’zosi bo‘lish uchun ajoyib imkoniyat bor!\n\nBiz sizdan ish arizangizni to‘ldirish uchun 11 ta oddiy savol so‘raymiz. Bu ko‘p vaqt olmaydi 🙂\n\nIstasangiz har qanday vaqtda /cancel bilan chiqib ketishingiz mumkin.\n\n⚠️ Diqqat: Ariza yuborish orqali siz ma’lumotlaringiz to‘g‘ri ekanini tasdiqlaysiz.",
+    "👋 NIS-Vacancy botiga xush kelibsiz!\n\n✨ Sizda oilamiz a’zosi bo‘lish uchun ajoyib imkoniyat bor!\n\nBiz sizdan ish arizangizni to‘ldirish uchun 12 ta oddiy savol so‘raymiz. Bu ko‘p vaqt olmaydi 🙂\n\nIstasangiz har qanday vaqtda /cancel bilan chiqib ketishingiz mumkin.\n\n⚠️ Diqqat: Ariza yuborish orqali siz ma’lumotlaringiz to‘g‘ri ekanini tasdiqlaysiz.",
   );
   await askCurrentStep(ctx);
 });

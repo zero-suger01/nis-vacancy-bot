@@ -19,6 +19,7 @@ function doPost(e) {
       "Sertifikatlar",
       "Tajriba",
       "Filial",
+      "Ishlash muddati",
       "CV",
       "Telegram",
     ]);
@@ -35,6 +36,7 @@ function doPost(e) {
     data.certificates,
     data.experience,
     data.branch,
+    data.duration,
     data.cv,
     data.telegram,
   ]);
