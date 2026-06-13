@@ -84,18 +84,15 @@ const BRANCH_OPTIONS = [
   "Namangan Shaxar",
   "Hali hal qilmadim",
 ];
-const BRANCH_DONE_TEXT = "✅ Tayyor";
 
-function buildBranchKeyboard(selected: string[]): Keyboard {
+const branchKeyboard = (() => {
   const kb = new Keyboard();
   BRANCH_OPTIONS.forEach((opt, i) => {
-    const tick = selected.includes(opt) ? "✓ " : "";
-    kb.text(`${tick}${opt}`);
+    kb.text(opt);
     if (i % 2 === 1) kb.row();
   });
-  kb.row().text(BRANCH_DONE_TEXT);
-  return kb.resized();
-}
+  return kb.resized().oneTime();
+})();
 
 const BRANCH_STEP_INDEX = 9; // index of branch in STEPS array
 
@@ -152,9 +149,13 @@ const STEPS: Step[] = [
   },
   {
     key: "branch",
-    // Multi-select — handled specially in the text handler, not via validate.
     prompt:
-      "Namangan International School (NIS) maktabining qaysi filialiga topshirmoqchisiz? (bir nechta tanlash mumkin)",
+      "Namangan International School (NIS) maktabining qaysi filialiga topshirmoqchisiz?",
+    keyboard: branchKeyboard,
+    validate: (text) =>
+      BRANCH_OPTIONS.includes(text)
+        ? undefined
+        : "Iltimos, quyidagi tugmalardan birini tanlang.",
   },
   {
     key: "duration",
@@ -259,14 +260,6 @@ async function askCurrentStep(ctx: BotContext): Promise<void> {
   const step = ctx.session.step;
   if (step >= 0 && step < CV_STEP) {
     const current = STEPS[step];
-    if (step === BRANCH_STEP_INDEX) {
-      ctx.session.branchSelections = [];
-      await ctx.reply(
-        `${questionHeader(step + 1)} - ${current.prompt}`,
-        { reply_markup: buildBranchKeyboard([]) },
-      );
-      return;
-    }
     await ctx.reply(
       `${questionHeader(step + 1)} - ${current.prompt}`,
       current.keyboard ? { reply_markup: current.keyboard } : undefined,
@@ -430,61 +423,6 @@ bot.on("message:text", async (ctx) => {
     return;
   }
   const text = ctx.message.text.trim();
-
-  // Branch question: multi-select with toggle keyboard.
-  if (step === BRANCH_STEP_INDEX) {
-    const rawText = text.replace(/^✓ /, ""); // strip tick prefix if user somehow types it
-    if (text === BRANCH_DONE_TEXT) {
-      const selections = ctx.session.branchSelections ?? [];
-      if (selections.length === 0) {
-        await ctx.reply(
-          "Kamida bitta filial tanlang yoki \"Hali hal qilmadim\" tugmasini bosing.",
-          { reply_markup: buildBranchKeyboard([]) },
-        );
-        return;
-      }
-      ctx.session.answers.branch = selections.join(", ");
-      ctx.session.branchSelections = [];
-      ctx.session.step = step + 1;
-      await ctx.reply("Qabul qilindi ✅", { reply_markup: { remove_keyboard: true } });
-      await askCurrentStep(ctx);
-      return;
-    }
-    const matched = BRANCH_OPTIONS.find(
-      (o) => o === rawText || o === text,
-    );
-    if (matched) {
-      let selections = [...(ctx.session.branchSelections ?? [])];
-      if (matched === "Hali hal qilmadim") {
-        // Exclusive — clear everything else.
-        selections = ["Hali hal qilmadim"];
-      } else {
-        // Remove "Hali hal qilmadim" if it was set, then toggle this item.
-        selections = selections.filter((s) => s !== "Hali hal qilmadim");
-        const idx = selections.indexOf(matched);
-        if (idx >= 0) {
-          selections.splice(idx, 1); // deselect
-        } else {
-          selections.push(matched); // select
-        }
-      }
-      ctx.session.branchSelections = selections;
-      const display =
-        selections.length > 0
-          ? selections.join(", ")
-          : "hech nima tanlanmagan";
-      await ctx.reply(
-        `Tanlangan: ${display}\n\nDavom etish uchun ✅ Tayyor tugmasini bosing.`,
-        { reply_markup: buildBranchKeyboard(selections) },
-      );
-      return;
-    }
-    await ctx.reply(
-      "Iltimos, quyidagi tugmalardan filial tanlang.",
-      { reply_markup: buildBranchKeyboard(ctx.session.branchSelections ?? []) },
-    );
-    return;
-  }
 
   if (step === CV_STEP) {
     if (text === SKIP_TEXT) {
